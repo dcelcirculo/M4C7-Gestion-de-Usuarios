@@ -95,3 +95,12 @@ Contiene los registros inválidos junto con la descripción del error encontrado
 | Persistencia en TXT | ✅ |
 | Manejo de errores | ✅ |
 | Mensajes amigables | ✅ |
+
+---
+
+# Retos opcionales (puntos extra)
+
+- [x] Contar cuántos usuarios hay registrados.
+- [x] Eliminar un usuario por nombre.
+- [x] Calcular la edad promedio de los usuarios.
+- [x] Ordenar la lista de usuarios por edad o por nombre.
