@@ -90,12 +90,13 @@ def siguiente_id(nombre_archivo):
             return ultimo_id + 1
     except FileNotFoundError:
         return 1  # Si el archivo no existe, el primer ID será 1
-    except Exception as error:
-        print(f"Error al obtener el siguiente ID: {error}") # Si ocurre un error inesperado al obtener el siguiente ID, se devuelve None para indicar que no se pudo obtener un ID válido.
-        return None
     except PermissionError:
         print("Error: No tiene permiso para acceder al archivo.")
         return None
+    except Exception as error:
+        print(f"Error al obtener el siguiente ID: {error}") # Si ocurre un error inesperado al obtener el siguiente ID, se devuelve None para indicar que no se pudo obtener un ID válido.
+        return None
+    
 
 # FUNCIONES DEL MENU:
 
