@@ -62,12 +62,22 @@ def validacion_duplicados(nombre, nombre_archivo):
 
 def validacion_archivo_vacio(nombre_archivo):
     # Validación para evitar archivos vacíos o con solo la cabecera
-    with open(nombre_archivo, "r", encoding='utf-8') as archivo:
-        lineas = archivo.readlines()
-        if len(lineas) <= 1:  # Solo la cabecera o el archivo está vacío
-            print("No hay usuarios registrados.")
-            return False
-        return lineas
+    try:
+        with open(nombre_archivo, "r", encoding='utf-8') as archivo:
+            lineas = archivo.readlines()
+            if len(lineas) <= 1:  # Solo la cabecera o el archivo está vacío
+                print("No hay usuarios registrados.")
+                return False
+            return lineas
+    except FileNotFoundError:
+        print("Error: El archivo no se encontró.")
+        return False
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
+        return False
+    except Exception as error:
+        print(f"Error inesperado: {error}")
+        return False
 
 def siguiente_id(nombre_archivo):
     try:
