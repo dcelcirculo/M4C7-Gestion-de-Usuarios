@@ -52,8 +52,10 @@ def validacion_duplicados(nombre, nombre_archivo):
                     return False
         
     except FileNotFoundError:
-        pass  # Si el archivo no existe, no hay duplicados, se puede registrar el usuario
-
+        return True  # Si el archivo no existe, no hay usuarios registrados, por lo que no hay duplicados, se devuelve True para permitir registrar el nuevo usuario.
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
+        return False  # Si no se tiene permiso para acceder al archivo, se devuelve False para evitar registrar un usuario potencialmente duplicado sin una verificación adecuada.
     except Exception as error:
         print(f"Error inesperado: {error}") # Si ocurre un error inesperado al verificar duplicados, se asume que no se pudo realizar la validación correctamente, por lo que se devuelve False para evitar registrar un usuario potencialmente duplicado sin una verificación adecuada.
         return False
@@ -280,19 +282,19 @@ def crear_archivo_errores():
                     else:
                         archivo_limpio.write(f"{id_usuario}, {nombre}, {edad}, {dato[3].strip()}, Registro válido\n")
                         nombres_vistos.append(nombre.lower())  
+            
+            with open("usuarios_limpios.txt", "r", encoding='utf-8') as usuario_limpio, open("usuarios_errores.txt", "r", encoding='utf-8') as usuario_errores:
+                lineas_limpias = usuario_limpio.readlines()
+                lineas_errores = usuario_errores.readlines()
+                print(f"- Registros válidos: {len(lineas_limpias)-1 }\n- Registros con errores: {len(lineas_errores)-1 }\n")
+            print(f"\nArchivos 'usuarios_limpios.txt' y 'usuarios_errores.txt' creados exitosamente.\n")
+       
     except FileNotFoundError:
         print("Error: El archivo no se encontró.")
     except PermissionError:
         print("Error: No tiene permiso para acceder al archivo.")
     except Exception as error:
         print(f"Error inesperado: {error}")
-        
-    print(f"\nArchivos 'usuarios_limpios.txt' y 'usuarios_errores.txt' creados exitosamente.\n")
-    
-    with open("usuarios_limpios.txt", "r", encoding='utf-8') as usuario_limpio, open("usuarios_errores.txt", "r", encoding='utf-8') as usuario_errores:
-        lineas_limpias = usuario_limpio.readlines()
-        lineas_errores = usuario_errores.readlines()
-        print(f"- Registros válidos: {len(lineas_limpias)-1 }\n- Registros con errores: {len(lineas_errores)-1 }\n")
 
 def ejecutar_programa():
      
