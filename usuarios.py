@@ -46,8 +46,8 @@ def validacion_duplicados(nombre, nombre_archivo):
             next(archivo)  # Saltar la cabecera
             for linea in archivo:
                 dato = linea.split(",")
-                nombre_archivo = dato[1].strip()
-                if nombre_archivo.lower() == nombre.lower():
+                nombre_registro = dato[1].strip()
+                if nombre_registro.lower() == nombre.lower():
                     print("Error: El usuario ya existe.")
                     return False
         
