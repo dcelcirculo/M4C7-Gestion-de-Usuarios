@@ -83,6 +83,87 @@ def siguiente_id(nombre_archivo):
     except Exception as error:
         print(f"Error al obtener el siguiente ID: {error}") # Si ocurre un error inesperado al obtener el siguiente ID, se devuelve None para indicar que no se pudo obtener un ID válido.
         return None
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
+        return None
+
+# FUNCIONES DEL MENU:
+
+def registrar_usuario():
+    nombre = input("Ingrese el nombre del usuario: ").strip()
+    edad_texto = input("Ingrese la edad del usuario: ").strip()      
+    
+    if validaciones_nombre(nombre) and validaciones_edad(edad_texto): # Validar el nombre y la edad antes de intentar registrar al usuario
+        edad = int(edad_texto) # Convertir la edad a entero después de validar que es un número válido
+        
+        if validacion_duplicados(nombre, ARCHIVO): # Validar que el usuario no sea duplicado antes de intentar registrar al usuario
+            try:          
+                with open(ARCHIVO, 'a', encoding='utf-8') as archivo:
+                    if archivo.tell() == 0:  # Verificar si el archivo está vacío
+                        archivo.write(
+                            cabecera[0] + " ," +
+                            cabecera[1] + " ," +
+                            cabecera[2] + " ," +
+                            cabecera[3] + " ," +
+                            cabecera[4] + "\n"
+                        )  # Escribir la cabecera si el archivo está vacío
+                    
+                    archivo.write(
+                        f"{siguiente_id(ARCHIVO)}, {nombre}, {edad}, {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, \n"
+                    ) # Escribir el nuevo usuario con el formato esperado (ID, Nombre, Edad, Fecha de Registro, Comentarios)
+                
+                print("Usuario registrado exitosamente.")
+            except PermissionError:
+                print("Error: No tiene permiso para acceder al archivo.")
+            except Exception as error:
+                print(f"Error inesperado: {error}")
+
+def buscar_usuario():
+    # Validación para evitar búsquedas con nombres vacíos o solo espacios en blanco
+    usuario_buscado = input("Ingrese el nombre del usuario a buscar: ").strip().lower()
+    if not usuario_buscado: # Si el nombre ingresado está vacío después de eliminar espacios en blanco, se muestra un mensaje de error y se detiene la función de búsqueda para evitar realizar una búsqueda con un nombre no válido.
+        print("Error: El nombre del usuario no puede estar vacío.")
+        return
+    encontrado = False
+    try:
+        with open(ARCHIVO, "r", encoding='utf-8') as archivo: #
+            next(archivo)  # Saltar la cabecera
+            for linea in archivo: 
+                dato = linea.split(",")
+                nombre_archivo = dato[1].strip()
+                if nombre_archivo.lower() == usuario_buscado:
+                    print(f"Usuario encontrado: \n")
+                    print(f"Id: {dato[0].strip()}")
+                    print(f"Nombre: {dato[1].strip()}")
+                    print(f"Edad: {dato[2].strip()}")
+                    print(f"Fecha de Registro: {dato[3].strip()}")
+                    encontrado = True
+                    break
+        if not encontrado:
+            print("Usuario no encontrado.")
+    except FileNotFoundError:
+        print("Error: El archivo no se encontró. No hay usuarios registrados.")
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
+    except Exception as error:
+        print(f"Error inesperado: {error}")
+ 
+def mostrar_usuarios():
+    try:
+        lineas = validacion_archivo_vacio(ARCHIVO)
+        if lineas:
+            print("Ususarios registrados: \n")
+            
+            for linea in lineas[1:]:  # Saltar la cabecera
+                dato = linea.split(",")
+                print(f"Id: {dato[0].strip()},\nNombre: {dato[1].strip()},\nEdad: {dato[2].strip()},\nFecha de Registro: {dato[3].strip()}\n")
+                
+    except FileNotFoundError:
+        print("Error: El archivo no se encontró. No hay usuarios registrados.")
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
+    except Exception as error:
+        print(f"Error inesperado: {error}")
 
 def validar_archivo():
     archivo_verificar = input("Ingrese el nombre del archivo a validar (con extensión .txt): ").strip()
@@ -116,79 +197,11 @@ def validar_archivo():
         
     except FileNotFoundError:
         print("Error: El archivo no se encontró.")
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
     except Exception as error:
         print(f"Error inesperado: {error}")
-
-# FUNCIONES DEL MENU:
-
-def registrar_usuario():
-    nombre = input("Ingrese el nombre del usuario: ").strip()
-    edad_texto = input("Ingrese la edad del usuario: ").strip()      
-    
-    if validaciones_nombre(nombre) and validaciones_edad(edad_texto): # Validar el nombre y la edad antes de intentar registrar al usuario
-        edad = int(edad_texto) # Convertir la edad a entero después de validar que es un número válido
         
-        if validacion_duplicados(nombre, ARCHIVO): # Validar que el usuario no sea duplicado antes de intentar registrar al usuario
-                      
-            with open(ARCHIVO, 'a', encoding='utf-8') as archivo:
-                if archivo.tell() == 0:  # Verificar si el archivo está vacío
-                    archivo.write(
-                        cabecera[0] + " ," +
-                        cabecera[1] + " ," +
-                        cabecera[2] + " ," +
-                        cabecera[3] + " ," +
-                        cabecera[4] + "\n"
-                    )  # Escribir la cabecera si el archivo está vacío
-                
-                archivo.write(
-                    f"{siguiente_id(ARCHIVO)}, {nombre}, {edad}, {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, \n"
-                ) # Escribir el nuevo usuario con el formato esperado (ID, Nombre, Edad, Fecha de Registro, Comentarios)
-                
-            print("Usuario registrado exitosamente.")
-
-def buscar_usuario():
-    # Validación para evitar búsquedas con nombres vacíos o solo espacios en blanco
-    usuario_buscado = input("Ingrese el nombre del usuario a buscar: ").strip().lower()
-    if not usuario_buscado: # Si el nombre ingresado está vacío después de eliminar espacios en blanco, se muestra un mensaje de error y se detiene la función de búsqueda para evitar realizar una búsqueda con un nombre no válido.
-        print("Error: El nombre del usuario no puede estar vacío.")
-        return
-    encontrado = False
-    try:
-        with open(ARCHIVO, "r", encoding='utf-8') as archivo: #
-            next(archivo)  # Saltar la cabecera
-            for linea in archivo: 
-                dato = linea.split(",")
-                nombre_archivo = dato[1].strip()
-                if nombre_archivo.lower() == usuario_buscado:
-                    print(f"Usuario encontrado: \n")
-                    print(f"Id: {dato[0].strip()}")
-                    print(f"Nombre: {dato[1].strip()}")
-                    print(f"Edad: {dato[2].strip()}")
-                    print(f"Fecha de Registro: {dato[3].strip()}")
-                    encontrado = True
-                    break
-        if not encontrado:
-            print("Usuario no encontrado.")
-    except FileNotFoundError:
-        print("Error: El archivo no se encontró. No hay usuarios registrados.")
-    except Exception as error:
-        print(f"Error inesperado: {error}")
- 
-def mostrar_usuarios():
-    try:
-        lineas = validacion_archivo_vacio(ARCHIVO)
-        if lineas:
-            print("Ususarios registrados: \n")
-            
-            for linea in lineas[1:]:  # Saltar la cabecera
-                dato = linea.split(",")
-                print(f"Id: {dato[0].strip()},\nNombre: {dato[1].strip()},\nEdad: {dato[2].strip()},\nFecha de Registro: {dato[3].strip()}\n")
-                
-    except FileNotFoundError:
-        print("Error: El archivo no se encontró. No hay usuarios registrados.")
-    except Exception as error:
-        print(f"Error inesperado: {error}")
-
 def convertir_archivo(nombre_archivo):
     lineas = validacion_archivo_vacio(nombre_archivo) # Validar que el archivo no esté vacío antes de intentar convertirlo
     if lineas: # Si el archivo no está vacío, proceder con la conversión
@@ -258,6 +271,8 @@ def crear_archivo_errores():
                         nombres_vistos.append(nombre.lower())  
     except FileNotFoundError:
         print("Error: El archivo no se encontró.")
+    except PermissionError:
+        print("Error: No tiene permiso para acceder al archivo.")
     except Exception as error:
         print(f"Error inesperado: {error}")
         
