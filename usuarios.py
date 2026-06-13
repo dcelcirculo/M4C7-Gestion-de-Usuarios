@@ -84,6 +84,41 @@ def siguiente_id(nombre_archivo):
         print(f"Error al obtener el siguiente ID: {error}") # Si ocurre un error inesperado al obtener el siguiente ID, se devuelve None para indicar que no se pudo obtener un ID válido.
         return None
 
+def validar_archivo():
+    archivo_verificar = input("Ingrese el nombre del archivo a validar (con extensión .txt): ").strip()
+    archivo_verificar = convertir_archivo(archivo_verificar)  # Convertir el archivo al formato esperado antes de validarlo
+    try:
+        lineas = validacion_archivo_vacio(archivo_verificar)
+        if lineas:
+            nombres_vistos = []  # Lista para rastrear nombres ya vistos y detectar duplicados
+            for linea in lineas[1:]:  # Saltar la cabecera
+                dato = linea.split(",")
+                id_usuario = dato[0].strip()
+                nombre = dato[1].strip()
+                edad = dato[2].strip()
+                
+                #Validación para evitar usuarios duplicados
+                if nombre.lower() in nombres_vistos:
+                    print(f"ID {id_usuario}: Nombre duplicado: {nombre}.\n")
+                    continue
+                else:
+                    nombres_vistos.append(nombre.lower())
+                
+                # Validaciones para nombres vacíos, edades negativas, no numéricas o mayores a 120
+                if not validaciones_nombre(nombre):
+                    print(f"ID {id_usuario}: Nombre: {nombre}.\n")
+                elif not validaciones_edad(edad):
+                    print(f"ID {id_usuario}: Edad: {edad}.\n")
+                else:
+                    print(f"ID {id_usuario}: {nombre} es válido.\n")
+                      
+                    
+        
+    except FileNotFoundError:
+        print("Error: El archivo no se encontró.")
+    except Exception as error:
+        print(f"Error inesperado: {error}")
+
 # FUNCIONES DEL MENU:
 
 def registrar_usuario():
@@ -154,39 +189,6 @@ def mostrar_usuarios():
     except Exception as error:
         print(f"Error inesperado: {error}")
 
-def validar_archivo():
-    archivo_verificar = input("Ingrese el nombre del archivo a validar (con extensión .txt): ").strip()
-    archivo_verificar = convertir_archivo(archivo_verificar)  # Convertir el archivo al formato esperado antes de validarlo
-    try:
-        lineas = validacion_archivo_vacio(archivo_verificar)
-        if lineas:
-            nombres_vistos = []  # Lista para rastrear nombres ya vistos y detectar duplicados
-            for linea in lineas[1:]:  # Saltar la cabecera
-                dato = linea.split(",")
-                id_usuario = dato[0].strip()
-                nombre = dato[1].strip()
-                edad = dato[2].strip()
-                
-                #Validación para evitar usuarios duplicados
-                if nombre.lower() in nombres_vistos:
-                    print(f"ID {id_usuario}: Nombre duplicado: {nombre}.\n")
-                    continue                
-                
-                # Validaciones para nombres vacíos, edades negativas, no numéricas o mayores a 120
-                if not validaciones_nombre(nombre):
-                    print(f"ID {id_usuario}: Nombre: {nombre}.\n")
-                elif not validaciones_edad(edad):
-                    print(f"ID {id_usuario}: Edad: {edad}.\n")
-                else:
-                    print(f"ID {id_usuario}: {nombre} es válido.\n")
-                    nombres_vistos.append(nombre.lower())  
-                    
-        
-    except FileNotFoundError:
-        print("Error: El archivo no se encontró.")
-    except Exception as error:
-        print(f"Error inesperado: {error}")
-
 def convertir_archivo(nombre_archivo):
     lineas = validacion_archivo_vacio(nombre_archivo) # Validar que el archivo no esté vacío antes de intentar convertirlo
     if lineas: # Si el archivo no está vacío, proceder con la conversión
@@ -201,7 +203,7 @@ def convertir_archivo(nombre_archivo):
                     cabecera[4] + "\n"
                 )
                 id_usuario = 1  # Asignar un ID secuencial a cada usuario
-                for linea in lineas: # Iterar sobre cada línea del archivo original (incluyendo la cabecera)
+                for linea in lineas[1:]: # Iterar sobre cada línea del archivo original (excluyendo la cabecera)
                     archivo_convertido.write(f"{id_usuario}, {linea.strip()}, \n") # Escribir cada línea en el nuevo archivo con el formato esperado (ID, Nombre, Edad, Fecha de Registro, Comentarios)
                     id_usuario += 1 # Incrementar el ID para el siguiente usuario
             return "archivo_convertido.txt"  # Devolver el nombre del nuevo archivo convertido para su validación
@@ -210,7 +212,6 @@ def convertir_archivo(nombre_archivo):
     else:
         return nombre_archivo  # Si el archivo está vacío, se devuelve el nombre original para que la función de validación pueda manejar el caso de archivo vacío
         
-
 def crear_archivo_errores():
     archivo_verificar = input("Ingrese el nombre del archivo a validar (con extensión .txt): ").strip()
     archivo_verificar = convertir_archivo(archivo_verificar)  # Convertir el archivo al formato esperado antes de validarlo
