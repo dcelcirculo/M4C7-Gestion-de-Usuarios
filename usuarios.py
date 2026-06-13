@@ -13,6 +13,7 @@ def menu():
     4. Validar un archivo
     5. Crear archivo de errores
     6. Cantidad de usuarios registrados
+    7. Eliminar un usuario por nombre
     0. Terminar
 """
 
@@ -315,6 +316,20 @@ def contar_usuarios():
     except Exception as error:
         print(f"Error inesperado: {error}")
 
+# 7. Eliminar un usuario por nombre
+def eliminar_usuario():
+    nombre_eliminar = input("Ingrese el nombre del usuario a eliminar: ").strip()
+    lineas = validacion_archivo_vacio(ARCHIVO)
+    if lineas:
+        for linea in lineas[1:]:
+            dato = linea.split(",")
+            nombre = dato[1].strip()
+            if nombre_eliminar == nombre:
+                with open(ARCHIVO, "w", encoding='utf-8') as archivo:
+                    for linea in lineas:
+                        if nombre_eliminar not in linea:
+                            archivo.write(linea)
+
 # Función principal para ejecutar el programa
 def ejecutar_programa():
      
@@ -334,6 +349,8 @@ def ejecutar_programa():
             crear_archivo_errores()
         elif opcion == "6":
             contar_usuarios()
+        elif opcion == "7":
+            eliminar_usuario()
         elif opcion == "0":
             print("Programa terminado.")
             break
